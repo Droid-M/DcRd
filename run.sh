@@ -1,21 +1,35 @@
 #!/bin/bash
 
-# Virtual environment name
-env_name="venv"
+# Nome do ambiente virtual
+VENV_DIR="venv"
+# Caminho para o arquivo requirements.txt
+REQ_FILE="source/requirements.txt"
+# Caminho para o script principal
+MAIN_SCRIPT="source/main.py"
 
-# Create virtual environment
-python3 -m venv $env_name
+# Caminho correto para os binários python e pip do venv (para evitar ter que ativar o ambiente ou usar `source`)
+PYTHON="$VENV_DIR/bin/python"
+PIP="$VENV_DIR/bin/pip"
 
-# Activate virtual environment
-source $env_name/bin/activate
-
-# Install dependencies, if requirements.txt exists
-if [[ -f "requirements.txt" ]]; then
-    pip install -r requirements.txt
-else
-    echo "requirements.txt file not found. Virtual environment created without additional packages."
+# Criar o ambiente virtual se não existir
+if [[ ! -d "$VENV_DIR" ]]; then
+    echo "Criando ambiente virtual '$VENV_DIR'..."
+    python3 -m venv "$VENV_DIR"
 fi
 
-echo "Virtual environment ready. To activate it, run:"
-echo "source $env_name/bin/activate"
+# Verificar se requirements.txt existe e instalar dependências
+if [[ -f "$REQ_FILE" ]]; then
+    echo "Instalando dependências de $REQ_FILE..."
+    "$PIP" install -r "$REQ_FILE"
+else
+    echo "Arquivo $REQ_FILE não encontrado. Nenhuma dependência será instalada."
+fi
 
+# Executar o script Python sem buffering
+if [[ -f "$MAIN_SCRIPT" ]]; then
+    clear
+    echo "Executando $MAIN_SCRIPT..."
+    "$PYTHON" -u "$MAIN_SCRIPT"
+else
+    echo "Arquivo $MAIN_SCRIPT não encontrado."
+fi
